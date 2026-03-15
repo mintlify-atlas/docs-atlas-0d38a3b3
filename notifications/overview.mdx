@@ -1,0 +1,109 @@
+---
+title: "Notifications overview"
+description: "How Valstore uses background tasks to notify you about wishlist matches, Night Market availability, and new bundles."
+---
+
+Valstore sends push notifications by running background tasks periodically, even when you are not actively using the app. These tasks re-authenticate your session and check whether a notification-worthy event has occurred.
+
+## How it works
+
+Valstore uses [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager) to schedule three recurring background tasks. When a task runs, it silently re-authenticates your Riot account using cookies saved in `SharedPreferences`, then compares current store data against your wishlist or previously stored values.
+
+Notifications are displayed using `flutter_local_notifications`.
+
+### Re-authentication
+
+Before checking your store, the background task calls `RiotService.reauthenticateUser()`, which uses your saved session cookies to request a fresh access token from:
+
+```
+https://auth.riotgames.com/api/v1/authorization
+```
+
+This happens silently — you do not need to log in again.
+
+## Notification types
+
+### Wishlist match
+
+Triggered by the `ValStoreStoreRenewal` WorkManager task. When your daily shop refreshes, the task fetches your current store and compares each skin's offer ID against your Firestore wishlist. If a match is found, a notification fires with the skin's splash image attached.
+
+| Field | Value |
+|-------|-------|
+| Title | `Skin arrived!` |
+| Body | `{skin name} is available in your shop` |
+| Image | Skin splash art |
+
+```dart
+for (var element in store.skins) {
+  if (wishlist.contains(element.offerId)) {
+    final imageReq = await get(Uri.parse(element.icon!));
+    final image = imageReq.bodyBytes;
+    await NotificationService.showInstantNotification(
+      "Skin arrived!",
+      "${element.name} is available in your shop",
+      image,
+    );
+  }
+}
+```
+
+### Night Market
+
+Triggered by the `NightMarketRenewal` WorkManager task. The task checks whether the Night Market is currently active. A `didNotifyNM` flag in `SharedPreferences` ensures you receive the notification only once per Night Market period.
+
+| Field | Value |
+|-------|-------|
+| Title | `Night market is back!` |
+| Body | `The Night Market is available again.` |
+| Image | None |
+
+```dart
+await NotificationService.showInstantNotificationWithoutPicture(
+  "Night market is back!",
+  "The Night Market is available again.",
+);
+```
+
+### New bundle
+
+Triggered by the `ValStoreBundleRenewal` WorkManager task. The task compares the featured bundle's `dataAssetID` against the ID stored in `SharedPreferences`. If the bundle has changed, a notification fires with the new bundle's image.
+
+| Field | Value |
+|-------|-------|
+| Title | `New Bundle Available!` |
+| Body | `The {bundle name} Bundle is now available for purchase` |
+| Image | Bundle artwork |
+
+```dart
+await NotificationService.showInstantNotification(
+  "New Bundle Available!",
+  "The $bundleName Bundle is now available for purchase",
+  bundleImage.bodyBytes,
+);
+```
+
+## WorkManager task names
+
+The three background tasks are registered under these names:
+
+| Task name | Trigger condition |
+|-----------|-------------------|
+| `ValStoreStoreRenewal` | Daily shop refreshes, checks wishlist |
+| `NightMarketRenewal` | Night Market becomes active |
+| `ValStoreBundleRenewal` | Featured bundle changes |
+
+WorkManager is initialized at app startup:
+
+```dart
+Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
+```
+
+<Note>
+  WorkManager scheduling is controlled by Android, not Valstore. Notifications may be delayed depending on your device's battery state and Android version.
+</Note>
+
+## Background restrictions
+
+Some Android manufacturers — including Xiaomi, OPPO, and Samsung — aggressively restrict background processes to save battery. This can prevent WorkManager tasks from running on schedule or at all.
+
+If you are not receiving notifications reliably, see [Notification troubleshooting](/notifications/troubleshooting) for manufacturer-specific steps.

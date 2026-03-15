@@ -1,97 +1,103 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Valstore"
+description: "Portable access to your Valorant shop — daily offers, Night Market, bundles, and more, right on your Android device."
+mode: "custom"
 ---
 
-## Setting up
+<div style={{background: "linear-gradient(135deg, #1a1a1a 0%, #2a0a0d 100%)", minHeight: "420px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 24px", borderRadius: "24px", marginBottom: "48px", boxShadow: "0 20px 40px rgba(0,0,0,0.5)", textAlign: "center"}}>
+  <div style={{background: "#f84555", color: "white", fontSize: "12px", fontWeight: "700", letterSpacing: "2px", textTransform: "uppercase", padding: "6px 16px", borderRadius: "100px", marginBottom: "24px", display: "inline-block"}}>
+    Open Source · MIT License
+  </div>
+  <h1 style={{color: "white", fontSize: "48px", fontWeight: "700", margin: "0 0 16px 0", lineHeight: "1.1", fontFamily: "Inter, sans-serif"}}>
+    Your Valorant shop, <span style={{color: "#f84555"}}>on the go</span>
+  </h1>
+  <p style={{color: "#aaaaaa", fontSize: "18px", maxWidth: "560px", margin: "0 0 40px 0", lineHeight: "1.6", fontFamily: "Inter, sans-serif"}}>
+    Valstore is a Flutter app that gives you instant access to your Valorant daily shop, Night Market, bundles, and skin gallery — without launching the game.
+  </p>
+  <div style={{display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center"}}>
+    <a href="/getting-started/installation" style={{background: "#f84555", color: "white", padding: "14px 28px", borderRadius: "6px", fontWeight: "600", textDecoration: "none", fontSize: "15px", fontFamily: "Inter, sans-serif"}}>
+      Get Started
+    </a>
+    <a href="https://github.com/ruzbyte/valstore-mobile" style={{background: "#ffffff", color: "#1a1a1a", padding: "14px 28px", borderRadius: "6px", fontWeight: "600", textDecoration: "none", fontSize: "15px", fontFamily: "Inter, sans-serif"}}>
+      View on GitHub
+    </a>
+  </div>
+</div>
 
-Get your documentation site up and running in minutes.
+## What Valstore does
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+Valstore connects to the official Riot Games authentication system and the Valorant PVP API to fetch your personalized store data in real time. No game client required.
 
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Daily Shop" icon="store" href="/features/player-shop">
+    See your 4 daily skin offers with prices, content tiers, and a live countdown to the next refresh.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Night Market" icon="moon" href="/features/night-market">
+    View your exclusive Night Market discounts whenever the event is active, with percentage savings shown per skin.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Featured Bundles" icon="box-open" href="/features/bundles">
+    Browse the current featured bundle with all included skins, video previews, and bundle pricing.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Skin Gallery" icon="images" href="/features/skin-gallery">
+    Browse every purchasable skin in the game with level and chroma variants, complete with video previews.
   </Card>
-</Columns>
+  <Card title="Wishlist & Alerts" icon="bell" href="/features/wishlist">
+    Add skins to your wishlist and get a push notification the moment they appear in your daily shop.
+  </Card>
+  <Card title="Inventory" icon="briefcase" href="/features/inventory">
+    View your full owned skin collection and see your current equipped loadout per weapon.
+  </Card>
+</CardGroup>
 
-## Create beautiful pages
+## Quick start
 
-Everything you need to create world-class documentation.
+<Steps>
+  <Step title="Install Flutter">
+    Ensure you have Flutter SDK 3.4.1 or higher and Android SDK installed on your development machine.
+  </Step>
+  <Step title="Clone and set up">
+    ```bash
+    git clone https://github.com/ruzbyte/valstore-mobile.git
+    cd valstore-mobile
+    flutter pub get
+    ```
+  </Step>
+  <Step title="Run on device">
+    Connect an Android device or start an emulator, then run:
+    ```bash
+    flutter run
+    ```
+  </Step>
+  <Step title="Log in">
+    Open Valstore and log in with your Riot Games account via the embedded browser. Select your region and your shop loads automatically.
+  </Step>
+</Steps>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+<Note>
+  Valstore is currently Android-only. iOS support is not planned. The project is archived but fully functional as of the last release.
+</Note>
 
-## Need inspiration?
+## Key details
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+| Detail | Value |
+|--------|-------|
+| Version | 2.1.1+18 |
+| Flutter SDK | ^3.4.1 |
+| License | MIT |
+| Platform | Android |
+| Status | Archived — functional, no active maintenance |
+
+<CardGroup cols={2}>
+  <Card title="Installation guide" icon="download" href="/getting-started/installation">
+    Build from source or sideload the APK onto your Android device.
+  </Card>
+  <Card title="Login & authentication" icon="key" href="/getting-started/login">
+    Understand how Riot SSO authentication and region selection work.
+  </Card>
+  <Card title="Notification setup" icon="bell" href="/notifications/overview">
+    Configure background refresh and push notifications for your wishlist.
+  </Card>
+  <Card title="Architecture" icon="sitemap" href="/development/architecture">
+    Explore the project structure, services, and data flow for contributors.
+  </Card>
+</CardGroup>

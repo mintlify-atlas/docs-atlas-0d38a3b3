@@ -1,0 +1,160 @@
+---
+title: "Account settings"
+description: "View your player profile, account level, player card, and wallet balances — and understand how Valstore authenticates and fetches your account data."
+---
+
+The account screen shows your full player profile as fetched from the Riot PVP API. All data is retrieved live on app load using your authenticated session.
+
+## What the account screen shows
+
+<Columns cols={2}>
+  <Card title="Player identity" icon="user">
+    Your Riot ID (name + tag) and account level fetched from the PVP API.
+  </Card>
+  <Card title="Player card" icon="id-card">
+    Your currently equipped player card image, loaded from Valorant's media CDN.
+  </Card>
+  <Card title="Level border" icon="award">
+    The level border frame matching your account level, fetched from the community Valorant API.
+  </Card>
+  <Card title="Wallet balances" icon="wallet">
+    Current balances for Valorant Points, Radianite Points, Free Agents, and Kingdom Credits.
+  </Card>
+</Columns>
+
+## How account data is fetched
+
+### Player name and tag
+
+Valstore sends a `PUT` request to the name service with your user ID:
+
+```
+PUT https://pd.{region}.a.pvp.net/name-service/v2/players
+```
+
+The request body is a JSON array containing your UUID.
+
+### Account level
+
+Account XP is fetched with a `GET` request:
+
+```
+GET https://pd.{region}.a.pvp.net/account-xp/v1/players/{userId}
+```
+
+The response includes your total XP, which maps to your displayed account level.
+
+### Player card
+
+Valstore reads the `playerCardID` from your current loadout, then fetches the image from the Valorant media CDN:
+
+```
+https://media.valorant-api.com/playercards/{cardId}/smallart.png
+```
+
+### Level border
+
+Level borders are fetched from the community Valorant API:
+
+```
+GET https://valorant-api.com/v1/levelborders
+```
+
+Valstore matches the returned border entries against your account level to display the correct frame.
+
+## Wallet balances
+
+Wallet data is fetched from:
+
+```
+GET https://pd.{region}.a.pvp.net/store/v1/wallet/{userId}/
+```
+
+The response is mapped to four currency types defined in `lib/services/riot_service.dart`:
+
+```dart riot_service.dart
+class Currencies {
+  static const String valorantPoints = "85ad13f7-3d1b-5128-9eb2-7cd8ee0b5741";
+  static const String radianitePoints = "e59aa87c-4cbf-517a-5983-6e81511be9b7";
+  static const String freeAgents = "f08d4ae3-939c-4576-ab26-09ce1f23bb37";
+  static const String kingdomCredits = "85ca954a-41f2-ce94-9b45-8ca3dd39a00d";
+}
+```
+
+These UUIDs are used as keys in the `Balances` map returned by the wallet endpoint:
+
+```dart riot_service.dart
+user = Player(
+  playerInfo: info,
+  wallet: Wallet(
+    valorantPoints: balanceResult["Balances"][Currencies.valorantPoints],
+    radianitePoints: balanceResult["Balances"][Currencies.radianitePoints],
+    freeAgents: balanceResult["Balances"][Currencies.freeAgents],
+    kingdomCredits: balanceResult["Balances"][Currencies.kingdomCredits],
+  ),
+  levelBorder: levelBorder,
+);
+```
+
+## Authentication and re-authentication
+
+When you log in, Valstore stores your Riot auth cookies in `SharedPreferences` under the key `"cookie"`. On subsequent app opens, these cookies allow silent re-authentication without showing the login screen again.
+
+The re-authentication flow in `lib/services/riot_service.dart` posts to Riot's authorization endpoint using the saved cookies and the current Riot client version header:
+
+```dart riot_service.dart
+static Future<void> reuathenticateUser() async {
+  final prefs = await SharedPreferences.getInstance();
+  String version = "";
+  try {
+    version = (await InofficialValorantAPI().getCurrentVersion())['version'];
+  } catch (e) {
+    version = "08.09.00.2521387";
+  }
+  // POST to https://auth.riotgames.com/api/v1/authorization
+  // with saved cookies and Riot client headers
+}
+```
+
+All PVP API requests also include platform headers that identify the client as a Windows PC:
+
+```dart riot_service.dart
+static Map<dynamic, String> platformHeaders = {
+  "X-Riot-ClientVersion": "release-09.09-shipping-11-2953160",
+  "X-Riot-ClientPlatform": const Base64Encoder().convert(
+    utf8.encode(jsonEncode(clientPlatform))
+  ),
+};
+```
+
+## SharedPreferences keys reference
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `region` | `String` | Your Valorant region code (e.g., `"eu"`, `"na"`) |
+| `cookie` | `String` | Serialized Riot auth cookies for re-authentication |
+| `currentBundle` | `String` | UUID of the current featured bundle, used for change detection |
+| `didNotifyNM` | `bool` | Flag to prevent duplicate Night Market push notifications |
+
+## How to log out
+
+Valstore does not have an explicit log out button. To sign out and remove all saved credentials, clear the app's stored data:
+
+<Steps>
+  <Step title="Open Android Settings">
+    Go to **Settings** on your Android device.
+  </Step>
+  <Step title="Navigate to app info">
+    Tap **Apps**, then find and tap **Valstore**.
+  </Step>
+  <Step title="Clear app data">
+    Tap **Storage**, then tap **Clear Data**. This removes your saved cookies, region, and all other preferences.
+  </Step>
+  <Step title="Log in again">
+    Reopen Valstore. You will be prompted to select your region and log in again.
+  </Step>
+</Steps>
+
+<Tip>
+  If the app is stuck on a loading screen, clearing app data and logging in again resolves most infinite loading states caused by expired or corrupted auth cookies.
+</Tip>

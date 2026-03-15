@@ -1,0 +1,54 @@
+---
+title: "Night Market"
+description: "Access your exclusive limited-time Night Market discounts when the event is active."
+---
+
+The Night Market is a limited-time Valorant event that gives you 6 personal skin offers at reduced VP prices. Your Night Market is unique to your account — the skins and discounts differ from other players.
+
+<Warning>
+  The Night Market is not always available. The tab only appears during active events. Outside of an event, the Night Market tab is hidden.
+</Warning>
+
+## How it appears
+
+Valstore checks the `bonusStore` field in your storefront API response. When `bonusStore` is non-null, the Night Market tab appears in the shop. When the event ends, the field returns null and the tab is removed.
+
+## What you see
+
+Each Night Market offer card shows:
+
+- **Skin name** and weapon type
+- **Original VP cost** (full price)
+- **Discounted VP cost** (event price)
+- **Percentage reduced** — the `discountPercent` field from the API response
+
+```dart riot_service.dart
+static Future<NightMarket?> getNightMarket() async {
+  // Returns null if Night Market is not active
+  // Returns NightMarket with durationRemain and skins (List<NightMarketSkin>)
+  // NightMarketSkin has skinData (FirebaseSkin) and percentageReduced (discount %)
+}
+```
+
+## Countdown
+
+The Night Market offer includes a `durationRemain` value (in seconds) that Valstore displays as a live countdown so you know how long your discounts last.
+
+## Background notifications
+
+The **`NightMarketRenewal`** WorkManager task runs periodically to check whether the Night Market has become active. When the event starts, you receive a local push notification so you don't miss your discounts.
+
+<Tip>
+  Make sure Valstore has notification permissions and battery optimization disabled so the background task can reach you promptly when Night Market opens.
+</Tip>
+
+## Related features
+
+<CardGroup cols={2}>
+  <Card title="Player shop" icon="store" href="/features/player-shop">
+    See your 4 regular daily skin offers.
+  </Card>
+  <Card title="Notifications" icon="bell" href="/notifications/overview">
+    Configure background tasks and alert permissions.
+  </Card>
+</CardGroup>

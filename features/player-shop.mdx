@@ -1,0 +1,74 @@
+---
+title: "Player shop"
+description: "View your 4 daily skin offers, track the refresh countdown, and understand content tier pricing."
+---
+
+The player shop shows the 4 skin offers Riot assigns to your account each day. Offers rotate every ~24 hours and are unique to your account — no two players see the same shop.
+
+## How to access
+
+Tap the **Shop** tab in the bottom navigation bar. Valstore fetches your current offers from the Valorant PVP API and displays them immediately.
+
+<Tip>
+  Shop loading speed depends on your internet connection. If the shop takes a few seconds to appear, wait for the API response to complete before navigating away.
+</Tip>
+
+## What you see
+
+Each offer card displays:
+
+- **Skin name** and weapon type
+- **VP cost** with the matching content tier color
+- **Content tier icon** (Select, Deluxe, Premium, Ultra, or Exclusive)
+- **Skin preview image**
+
+## Content tiers
+
+Valstore color-codes each offer by its content tier based on VP cost.
+
+| Tier | VP cost | Color |
+|------|---------|-------|
+| Select | 875 VP | Blue `#5b9cdd` |
+| Deluxe | 1275 VP | Teal `#28bda7` |
+| Premium | 1775 VP | Pink `#cb558d` |
+| Ultra | 2175 VP | Orange `#fd9257` |
+| Exclusive | 2475 VP | Gold `#eed878` |
+
+The tier is derived at runtime from the VP cost of each offer:
+
+```dart riot_service.dart
+static ContentTier getContentTierByCost(int cost) {
+  // Maps VP cost to content tier color + icon URL
+  // 875 VP  = Select    (blue   #5b9cdd)
+  // 1275 VP = Deluxe    (teal   #28bda7)
+  // 1775 VP = Premium   (pink   #cb558d)
+  // 2175 VP = Ultra     (orange #fd9257)
+  // 2475 VP = Exclusive (gold   #eed878)
+}
+```
+
+## Shop refresh and countdown
+
+The shop displays a live countdown to the next rotation. The remaining time comes from `singleItemOffersRemainingDurationInSeconds` in the storefront response.
+
+In the background, a WorkManager task named **`ValStoreStoreRenewal`** runs periodically to:
+
+1. Re-authenticate with Riot using your stored credentials.
+2. Fetch the latest shop offers.
+3. Compare the new offers against your [wishlist](/features/wishlist).
+4. Fire a local push notification if any wishlisted skin is in the new shop.
+
+<Note>
+  The background task requires battery optimization to be disabled for Valstore on your device. See the [notifications overview](/notifications/overview) for setup steps.
+</Note>
+
+## Related features
+
+<CardGroup cols={2}>
+  <Card title="Wishlist" icon="heart" href="/features/wishlist">
+    Save skins you want and get notified when they appear in your shop.
+  </Card>
+  <Card title="Skin gallery" icon="images" href="/features/skin-gallery">
+    Browse all purchasable skins to find what to wish for.
+  </Card>
+</CardGroup>

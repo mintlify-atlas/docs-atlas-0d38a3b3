@@ -1,0 +1,80 @@
+---
+title: "Wishlist"
+description: "Track skins you want and receive a push notification the moment they appear in your daily shop."
+---
+
+The wishlist lets you save skins you want to buy. When any wishlisted skin appears in your daily shop, Valstore fires a local push notification so you never miss a chance to purchase it.
+
+## How to add a skin
+
+You can wishlist a skin from two places:
+
+<Tabs>
+  <Tab title="From the player shop">
+    When a skin appears in your daily offers, tap the heart icon on its card. The skin is saved to your wishlist immediately.
+  </Tab>
+  <Tab title="From the skin gallery">
+    Open the [skin gallery](/features/skin-gallery), find the skin you want, and tap the heart icon on its detail view.
+  </Tab>
+</Tabs>
+
+Tapping the heart icon again removes the skin from your wishlist.
+
+## Storage and sync
+
+Your wishlist is stored in **Cloud Firestore**, keyed to your Riot user ID. Valstore loads your wishlist from Firestore each time the app starts via `initWishlist()`:
+
+```dart valstore_provider.dart
+Future<void> initWishlist() // loads from Firestore on startup
+```
+
+The Firestore operations backing the wishlist are:
+
+```dart firestore_service.dart
+Future<List<String>> getUserWishlist(String userId)       // returns list of skin offer UUIDs
+Future<void> addSkinToUserWishlist(String userId, String skinUuid)
+Future<void> removeSkinFromWishlist(String userId, String skinUuid)
+```
+
+## Local state
+
+During an app session, your wishlist is held in memory in `ValstoreProvider._skins` (a list of skin offer UUIDs). The `toggleWishlist()` method keeps Firestore and local state in sync:
+
+```dart valstore_provider.dart
+void toggleWishlist(String uuid) {
+  final isWished = _skins.contains(uuid);
+  if (isWished) {
+    FireStoreService().removeSkinFromWishlist(RiotService.userId, uuid);
+    _skins.remove(uuid);
+  } else {
+    FireStoreService().addSkinToUserWishlist(RiotService.userId, uuid);
+    _skins.add(uuid);
+  }
+  notifyListeners();
+}
+```
+
+Call `isInWishlist(uuid)` to check the local list without touching Firestore:
+
+```dart valstore_provider.dart
+bool isInWishlist(String uuid) // checks local list
+```
+
+## Notification trigger
+
+The **`ValStoreStoreRenewal`** background task calls `recheckStore()` after each shop refresh. This function compares the incoming shop skin UUIDs against your local wishlist. If any UUID matches, Valstore schedules a local push notification.
+
+<Note>
+  Notifications require the background task to be running. If you stop receiving alerts, check that battery optimization is disabled for Valstore. See the [notifications troubleshooting guide](/notifications/troubleshooting).
+</Note>
+
+## Related features
+
+<CardGroup cols={2}>
+  <Card title="Player shop" icon="store" href="/features/player-shop">
+    See your 4 daily offers and wishlist skins directly from the shop.
+  </Card>
+  <Card title="Skin gallery" icon="images" href="/features/skin-gallery">
+    Browse the full catalog and build your wishlist before skins appear.
+  </Card>
+</CardGroup>

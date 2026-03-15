@@ -1,0 +1,71 @@
+---
+title: "Region setup"
+description: "Select and store your Valorant region so Valstore connects to the correct Riot PVP API endpoint."
+---
+
+Valstore connects to Riot's regional PVP API endpoints to fetch your shop data. The base URL includes your region code — for example, `https://pd.eu.a.pvp.net/` for Europe. If the wrong region is stored, the API returns no data or an error.
+
+<Warning>
+  Selecting the wrong region results in an empty shop or request errors. Your region must match your Riot Games account's assigned region.
+</Warning>
+
+## Supported regions
+
+| Region | Code | Description |
+|--------|------|-------------|
+| North America | `na` | United States, Canada |
+| Europe | `eu` | Europe, Middle East, Africa |
+| Asia Pacific | `ap` | Asia, Australia, Oceania |
+| Korea | `kr` | South Korea |
+| Brazil | `br` | Brazil |
+| Latin America | `latam` | Latin America |
+
+## How to set your region
+
+On first launch, if no region is saved, Valstore automatically navigates to the region selection screen (`/region`). Select your region from the list and the app saves it before loading your shop.
+
+This logic lives in `lib/valstore_provider.dart`:
+
+```dart valstore_provider.dart
+String? region = prefs.getString("region");
+
+if (region == null) {
+  navigatorKey.currentState!.pushNamed("/region");
+}
+```
+
+Once you select a region, it is saved to `SharedPreferences` under the key `"region"` and used for every subsequent PVP API request.
+
+## How region is used
+
+The region code is appended directly to the PVP API base URL. For example, `RiotService.getStoreLink` in `lib/services/riot_service.dart` builds the storefront URL as:
+
+```dart riot_service.dart
+static String getStoreLink(String uuid, String region) =>
+    "https://pd.$region.a.pvp.net/store/v3/storefront/$uuid";
+```
+
+The same pattern applies to all other PVP API calls — wallet, player info, account XP, and so on.
+
+## How to change your region
+
+Valstore does not provide an in-app region change option. To reset your region selection, clear the app's stored data:
+
+<Steps>
+  <Step title="Open Android Settings">
+    Go to **Settings** on your Android device.
+  </Step>
+  <Step title="Navigate to app info">
+    Tap **Apps** (or **Application Manager**), then find and tap **Valstore**.
+  </Step>
+  <Step title="Clear app data">
+    Tap **Storage**, then tap **Clear Data**. This removes all saved preferences, including your region and authentication cookies.
+  </Step>
+  <Step title="Relaunch Valstore">
+    Open Valstore. The app detects no saved region and navigates to the region selection screen automatically.
+  </Step>
+</Steps>
+
+<Note>
+  Clearing app data also removes your saved login cookies, so you will need to log in again after selecting your region.
+</Note>

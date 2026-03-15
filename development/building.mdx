@@ -1,0 +1,143 @@
+---
+title: 'Building Valstore'
+description: 'Build a debug or release APK from source, configure Firebase, sign the release build, and regenerate launcher icons.'
+keywords: ['build', 'flutter', 'apk', 'release', 'keystore', 'firebase', 'google-services']
+---
+
+<Warning>
+  Valstore uses unofficial Riot API endpoints and was removed from the Google Play Store. The project is **archived** and no longer under active development. Use it at your own risk and be aware that it may violate Riot Games' Terms of Service.
+</Warning>
+
+## Prerequisites
+
+Before building, make sure the following are installed on your machine:
+
+| Requirement | Version | Notes |
+|---|---|---|
+| Flutter SDK | `^3.4.1` | [flutter.dev/get-started](https://flutter.dev/get-started) |
+| Android SDK | API 21+ | Included with Android Studio |
+| Java | 11+ | Required by the Gradle build system |
+| Git | Any | To clone the repository |
+
+<Note>
+  The `workmanager` package is pulled directly from the `fluttercommunity/flutter_workmanager` `main` branch via a Git dependency in `pubspec.yaml`. Your build machine must have internet access when running `flutter pub get`.
+</Note>
+
+## Firebase setup
+
+Valstore requires a `google-services.json` file for Firebase to initialise. Without it, the Gradle build fails.
+
+<Steps>
+  <Step title="Create a Firebase project">
+    Open the [Firebase Console](https://console.firebase.google.com) and create a new project (or use an existing one).
+  </Step>
+  <Step title="Register an Android app">
+    In your Firebase project, add an Android app. Use the package name `de.zaroc.valstore` to match the app's `android/app/build.gradle`.
+  </Step>
+  <Step title="Download google-services.json">
+    Download the generated `google-services.json` and place it in `android/app/`:
+
+    ```
+    valstore-mobile/
+    └── android/
+        └── app/
+            └── google-services.json  ← place it here
+    ```
+  </Step>
+  <Step title="Enable Firestore and Authentication">
+    In the Firebase Console, enable **Cloud Firestore** and **Firebase Authentication** for your project. Valstore uses Firestore for the skin registry and user wishlist, and Firebase Auth to identify users.
+  </Step>
+</Steps>
+
+## Building a debug APK
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/ruzbyte/valstore-mobile.git
+    cd valstore-mobile
+    ```
+  </Step>
+  <Step title="Install dependencies">
+    ```bash
+    flutter pub get
+    ```
+  </Step>
+  <Step title="Place google-services.json">
+    Copy your `google-services.json` into `android/app/` as described in [Firebase setup](#firebase-setup).
+  </Step>
+  <Step title="Run or build">
+    To run directly on a connected device or emulator:
+
+    ```bash
+    flutter run
+    ```
+
+    To build a debug APK:
+
+    ```bash
+    flutter build apk --debug
+    ```
+
+    The APK is written to `build/app/outputs/flutter-apk/app-debug.apk`.
+  </Step>
+</Steps>
+
+## Building a release APK
+
+A release build requires a signing keystore. Follow these steps to create one and configure Gradle.
+
+<Steps>
+  <Step title="Create a keystore">
+    Run the following command to generate a new keystore. Keep this file safe — you need it to sign every future release of the same package.
+
+    ```bash
+    keytool -genkey -v \
+      -keystore ~/valstore.keystore \
+      -alias valstore \
+      -keyalg RSA \
+      -keysize 2048 \
+      -validity 10000
+    ```
+  </Step>
+  <Step title="Create android/key.properties">
+    Create the file `android/key.properties` with the keystore details:
+
+    ```properties
+    storePassword=<your-keystore-password>
+    keyPassword=<your-key-password>
+    keyAlias=valstore
+    storeFile=<absolute-path-to>/valstore.keystore
+    ```
+
+    <Warning>
+      Do not commit `android/key.properties` or your keystore file to version control. Add both to `.gitignore`.
+    </Warning>
+  </Step>
+  <Step title="Build the release APK">
+    ```bash
+    flutter build apk --release
+    ```
+
+    The signed APK is written to `build/app/outputs/flutter-apk/app-release.apk`.
+  </Step>
+</Steps>
+
+## Regenerating launcher icons
+
+If you change the app icon, regenerate the launcher icons from `flutter_launcher_icons.yaml`:
+
+```bash
+flutter pub run flutter_launcher_icons
+```
+
+This reads the configuration in `flutter_launcher_icons.yaml` and writes the appropriate icon sizes into `android/app/src/main/res/`.
+
+## Package information
+
+| Field | Value |
+|---|---|
+| Package name | `de.zaroc.valstore` |
+| App version | `2.1.1+18` |
+| Flutter SDK | `^3.4.1` |
+| Min Android SDK | API 21 (Android 5.0) |

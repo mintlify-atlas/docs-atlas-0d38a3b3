@@ -1,0 +1,71 @@
+---
+title: "Skin gallery"
+description: "Browse every purchasable Valorant skin with level and chroma variants, video previews, and wishlist controls."
+---
+
+The skin gallery lets you explore the full Valorant skin catalog without leaving the app. You can inspect every level and chroma variant, watch video previews, and add skins to your wishlist directly from the gallery.
+
+## How to access
+
+Tap the **Gallery** tab in the bottom navigation. The gallery loads all purchasable skins in a scrollable grid.
+
+## What you see
+
+Each skin card in the grid shows:
+
+- **Skin name** and weapon
+- **Display icon** (splash art)
+- **Content tier** color indicator
+
+Tap a skin to open the detail view, which includes:
+
+- All **levels** — each level has its own display icon and video preview
+- All **chromas** — alternate color variants with individual icons
+
+## Data source
+
+The gallery pulls from the community Valorant API:
+
+```
+https://valorant-api.com/v1/weapons/skins
+```
+
+This returns the full skin catalog. Valstore then filters it to only purchasable skins using `getLocalOffers()`, which fetches the current offer list from the Valorant store:
+
+```
+https://pd.{region}.a.pvp.net/store/v2/offers/
+```
+
+Only skins that appear in the store offers list are shown in the gallery — skins available exclusively through other means (contracts, battle pass) are excluded.
+
+## Adding a skin to your wishlist
+
+<Steps>
+  <Step title="Open the gallery">
+    Tap the **Gallery** tab in the bottom navigation.
+  </Step>
+  <Step title="Find the skin">
+    Scroll or search for the skin you want.
+  </Step>
+  <Step title="Tap the heart icon">
+    On the skin detail view, tap the heart (wishlist) icon. The icon fills to confirm the skin is saved.
+  </Step>
+  <Step title="Get notified">
+    When that skin appears in your daily shop, Valstore sends you a push notification.
+  </Step>
+</Steps>
+
+<Tip>
+  You can also wishlist skins directly from the [player shop](/features/player-shop) when they appear in your daily offers.
+</Tip>
+
+## Related features
+
+<CardGroup cols={2}>
+  <Card title="Wishlist" icon="heart" href="/features/wishlist">
+    Manage your saved skins and notification preferences.
+  </Card>
+  <Card title="Inventory" icon="briefcase" href="/features/inventory">
+    See which skins you already own.
+  </Card>
+</CardGroup>

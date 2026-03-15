@@ -1,0 +1,41 @@
+---
+title: 'Introduction'
+description: 'Valstore is a Flutter app for Android that lets you view your Valorant daily shop, night market, bundles, and inventory without opening the game.'
+keywords: ['valorant', 'shop', 'flutter', 'android', 'valstore']
+---
+
+Valstore is a portable Valorant shop viewer built with Flutter for Android. It authenticates with your Riot Games account via SSO and fetches your personalized shop data directly from Riot's APIs — no third-party servers involved.
+
+## Features
+
+- **Daily shop** — View all four skins in your rotating daily offer
+- **Night market** — Check your discounted night market skins when the event is active
+- **Bundles** — Browse skins that are part of the current featured bundle
+- **Gallery** — Explore all Valorant weapon skins with pricing
+- **Wishlist** — Save skins you want and get notified when they appear in your shop
+- **Push notifications** — Background refresh via WorkManager alerts you when a wishlisted skin is available
+- **Inventory** — View the skins you already own
+
+## Project status
+
+<Note>
+  Valstore was previously available on the Google Play Store but has since been removed and the repository is archived. The app is fully functional and can still be built from source or sideloaded. It is released under the MIT license.
+</Note>
+
+## Credits
+
+Valstore relies on community-maintained API resources:
+
+- [Not0fficer/Valorant-API](https://github.com/Not0fficer/Valorant-API) — skin data, icons, and pricing
+- [techchrism/valorant-api-docs](https://github.com/techchrism/valorant-api-docs) — documentation for the unofficial Riot client APIs used for authentication and shop endpoints
+
+## Get started
+
+<Columns cols={2}>
+  <Card title="Installation" icon="wrench" href="/getting-started/installation">
+    Build Valstore from source or sideload a release APK onto your Android device.
+  </Card>
+  <Card title="Logging in" icon="right-to-bracket" href="/getting-started/login">
+    Authenticate with your Riot Games account to load your personal shop data.
+  </Card>
+</Columns>

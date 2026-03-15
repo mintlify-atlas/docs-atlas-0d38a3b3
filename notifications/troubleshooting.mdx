@@ -1,0 +1,96 @@
+---
+title: "Notification troubleshooting"
+description: "Fixes for common notification issues in Valstore, including background process restrictions on Xiaomi, OPPO, and Samsung devices."
+---
+
+<Warning>
+  Some manufacturers (Xiaomi, OPPO, Samsung) aggressively kill background processes to save battery. If you are on one of these devices, follow the manufacturer-specific steps below in addition to the general fixes.
+</Warning>
+
+<AccordionGroup>
+  <Accordion title="Not receiving any notifications">
+    Valstore requires notification permission to display alerts. If you have never granted this permission, or if it was revoked, notifications will not appear.
+
+    <Steps>
+      <Step title="Open Android Settings">
+        Go to **Settings** > **Apps** > **Valstore**.
+      </Step>
+      <Step title="Open notification settings">
+        Tap **Notifications**.
+      </Step>
+      <Step title="Enable notifications">
+        Make sure **Show notifications** is turned on. You can also verify that individual notification channels are not blocked.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Notifications stop after some time">
+    Android battery optimization can terminate Valstore's background WorkManager tasks, preventing the app from checking your store and sending notifications.
+
+    <Steps>
+      <Step title="Open battery settings for Valstore">
+        Go to **Settings** > **Apps** > **Valstore** > **Battery**.
+      </Step>
+      <Step title="Disable battery optimization">
+        Select **Unrestricted** or turn off **Battery optimization** for Valstore.
+      </Step>
+    </Steps>
+
+    **Xiaomi-specific steps:**
+
+    <Steps>
+      <Step title="Open app info">
+        Hold the Valstore app icon, then tap **App-Info**.
+      </Step>
+      <Step title="Change battery saver setting">
+        Tap **Battery saver** and select **No restrictions**.
+      </Step>
+    </Steps>
+
+    <Tip>
+      Keep Valstore in your recent apps or add it to your device's battery whitelist for the most reliable background behavior.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="No notifications after phone restart">
+    On some devices, background tasks are not rescheduled after a reboot unless the app has Autostart permission.
+
+    <Steps>
+      <Step title="Find Autostart settings">
+        Go to **Settings** > **Apps** > **Valstore**. Look for **Autostart**, **Auto-launch**, or a similar option. The exact label varies by manufacturer.
+      </Step>
+      <Step title="Enable Autostart">
+        Toggle Autostart on for Valstore. This allows WorkManager to reschedule background tasks after a restart.
+      </Step>
+    </Steps>
+
+    <Note>
+      On Xiaomi devices, Autostart is found under **Settings** > **Apps** > **Manage apps** > **Valstore** > **Autostart**.
+    </Note>
+  </Accordion>
+
+  <Accordion title="Notifications are delayed">
+    Valstore's background tasks are scheduled by Android's WorkManager, which batches and defers work based on battery state, network conditions, and Android version. Valstore cannot control the exact time a task runs.
+
+    To improve timeliness:
+
+    - Disable battery optimization for Valstore (see above).
+    - Keep the device connected to power or on a strong network when you expect your shop to refresh.
+    - On Android 12+, check that no app standby bucket restrictions apply to Valstore.
+  </Accordion>
+
+  <Accordion title="Wishlist notification not firing">
+    The wishlist check runs when the `ValStoreStoreRenewal` task executes — once per daily shop cycle. If the skin was added to your wishlist after the shop already refreshed, the notification will not fire until the next renewal.
+
+    **Checklist:**
+
+    - Confirm the skin is saved to your wishlist in the app before your shop resets.
+    - Make sure your Firestore wishlist is synced (you should see the skin listed under your wishlist in the app).
+    - Verify that background tasks are not being killed (see "Notifications stop after some time" above).
+    - Re-authenticate once manually by opening the app, to confirm your session cookies are still valid.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  Adding Valstore to your battery whitelist is the single most effective step for reliable notifications on restricted Android devices.
+</Tip>

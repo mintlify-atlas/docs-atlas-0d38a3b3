@@ -1,0 +1,76 @@
+---
+title: "Inventory"
+description: "See every skin you own and your currently equipped loadout for each weapon."
+---
+
+The inventory shows all the skins in your Valorant collection and your active loadout — the skin equipped on each weapon right now.
+
+## How to access
+
+Tap the **Account** tab in the bottom navigation, then select **Inventory**. Valstore fetches your owned items and current loadout from the Valorant PVP API.
+
+## Owned skins
+
+Valstore retrieves your full skin collection using the entitlements endpoint:
+
+```
+GET https://pd.{region}.a.pvp.net/store/v1/entitlements/{userId}/{itemTypeId}
+```
+
+The item type ID for weapon skins is `e7c63390-eda7-46e0-bb7a-a6abdacd2433`.
+
+```dart riot_service.dart
+static Future<List<Data?>?> getUserOwnedItems() async {
+  // GET https://pd.{region}.a.pvp.net/store/v1/entitlements/{userId}/{itemTypes['skins']}
+  // Returns all owned skin UUIDs, maps to full skin data from valorant-api.com
+}
+```
+
+This returns a list of skin UUIDs. Valstore maps each UUID to full skin metadata (name, icon, levels, chromas) from `valorant-api.com`.
+
+## Equipped loadout
+
+The loadout view shows the skin currently equipped on each weapon. This comes from the personalization endpoint:
+
+```
+GET https://pd.{region}.a.pvp.net/personalization/v2/players/{userId}/playerloadout
+```
+
+```dart riot_service.dart
+static Future<List<PlayerLoadoutItem>> getPlayerEquipedSkins() async {
+  // GET https://pd.{region}.a.pvp.net/personalization/v2/players/{userId}/playerloadout
+  // Returns currently equipped skin per weapon
+}
+```
+
+Each `PlayerLoadoutItem` maps to a weapon and the skin UUID active on it. Valstore resolves each UUID to the full skin name and preview image for display.
+
+## Caching
+
+The player loadout is cached after the first successful fetch. Subsequent visits to the inventory screen use the cached result, avoiding an unnecessary API call.
+
+<Note>
+  If you change your loadout in-game and want Valstore to reflect the update, restart the app to clear the cache and trigger a fresh fetch.
+</Note>
+
+## What each section shows
+
+<AccordionGroup>
+  <Accordion title="Owned skins">
+    A scrollable list of every weapon skin in your collection, including the skin name, weapon type, display icon, and content tier. Skins are fetched from the entitlements API and enriched with metadata from `valorant-api.com`.
+  </Accordion>
+  <Accordion title="Equipped loadout">
+    Your current in-game loadout — one skin per weapon. This reflects exactly what Valorant shows when you inspect your collection in the game client.
+  </Accordion>
+</AccordionGroup>
+
+## Related features
+
+<CardGroup cols={2}>
+  <Card title="Skin gallery" icon="images" href="/features/skin-gallery">
+    Browse all purchasable skins, including ones you don't yet own.
+  </Card>
+  <Card title="Wishlist" icon="heart" href="/features/wishlist">
+    Track skins you want to add to your collection.
+  </Card>
+</CardGroup>

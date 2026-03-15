@@ -1,0 +1,68 @@
+---
+title: 'Logging in'
+description: 'Authenticate with your Riot Games account using the embedded WebView to load your personal Valorant shop.'
+keywords: ['login', 'riot', 'authentication', 'sso', 'webview', 'region']
+---
+
+Valstore authenticates you with Riot Games using their official OAuth2/SSO flow. The login happens inside an embedded browser (`flutter_inappwebview`) — your credentials go directly to Riot's servers and are never sent elsewhere. After login, the app captures your access token and entitlements JWT to fetch your shop data.
+
+## Login flow
+
+<Steps>
+  <Step title="Launch the app">
+    On first launch you are routed to the region selection screen (`/region`). You must choose your region before logging in.
+  </Step>
+
+  <Step title="Select your region">
+    Choose the region that matches your Riot account:
+
+    | Region | Code |
+    |--------|------|
+    | North America | `NA` |
+    | Europe | `EU` |
+    | Asia Pacific | `AP` |
+    | Korea | `KR` |
+    | Brazil | `BR` |
+    | Latin America | `LATAM` |
+
+    Your selection is persisted in `SharedPreferences` under the key `"region"` and used for all subsequent API requests.
+  </Step>
+
+  <Step title="Log in with your Riot account">
+    After selecting a region, the app navigates to `/login` and opens an embedded browser pointed at the Riot authorization URL:
+
+    ```
+    https://auth.riotgames.com/authorize?redirect_uri=https%3A%2F%2Fplayvalorant.com%2Fopt_in&client_id=play-valorant-web-prod&response_type=token%20id_token&nonce=1&scope=account%20openid
+    ```
+
+    Enter your Riot Games username and password in the embedded WebView. Two-factor authentication (2FA) is supported — complete the prompt if it appears.
+  </Step>
+
+  <Step title="Access token is captured">
+    After a successful login, Riot redirects to the `playvalorant.com` callback URL. The app intercepts this redirect, extracts the `access_token` fragment from the URL, and decodes the JWT payload using the `jwt_decode` package.
+  </Step>
+
+  <Step title="Entitlements token is fetched">
+    With the access token in hand, the app calls the Riot entitlements endpoint to retrieve the entitlements JWT required for shop API calls:
+
+    ```
+    POST https://entitlements.auth.riotgames.com/api/token/v1/
+    ```
+
+    The `Authorization: Bearer <access_token>` header is set automatically.
+  </Step>
+
+  <Step title="Shop data loads">
+    Once both tokens are available, the app navigates to `/store` and fetches your daily shop, bundles, and night market. You are now fully authenticated.
+  </Step>
+</Steps>
+
+## Re-authentication
+
+<Info>
+  Auth cookies set during the WebView session are saved to `SharedPreferences`. The WorkManager background task uses these cookies to silently re-authenticate and refresh shop data without requiring you to log in again. If the cookies expire, you will be prompted to log in again.
+</Info>
+
+<Warning>
+  Your access token and auth cookies grant full access to your Riot account. Do not share them with anyone or paste them into unknown tools. Valstore stores these values locally on your device only and does not transmit them to any server other than Riot's own endpoints.
+</Warning>

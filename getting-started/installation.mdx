@@ -1,0 +1,97 @@
+---
+title: 'Installation'
+description: 'Build Valstore from source using Flutter or sideload a release APK onto your Android device.'
+keywords: ['install', 'flutter', 'android', 'apk', 'sideload', 'build']
+---
+
+Valstore is an Android-only Flutter app. You can run it by building from source with the Flutter CLI or by sideloading a prebuilt APK.
+
+## Prerequisites
+
+Before you start, make sure you have the following installed:
+
+- **Flutter SDK `^3.4.1`** — [flutter.dev/get-started](https://flutter.dev/get-started)
+- **Android SDK** — included with Android Studio or installable via the CLI
+- **Git** — to clone the repository
+- A **physical Android device** with USB debugging enabled, or an **Android emulator** configured in Android Studio
+
+<Warning>
+  iOS is not supported. The app targets Android only and uses Android-specific dependencies including WorkManager and firebase_core configured for Android.
+</Warning>
+
+## Option 1: Build from source
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/ruzbyte/valstore-mobile.git
+    cd valstore-mobile
+    ```
+  </Step>
+
+  <Step title="Install dependencies">
+    Fetch all Flutter packages declared in `pubspec.yaml`:
+
+    ```bash
+    flutter pub get
+    ```
+
+    This installs all dependencies including `provider`, `firebase_core`, `flutter_inappwebview`, `workmanager`, and others.
+  </Step>
+
+  <Step title="Connect your device or start an emulator">
+    Plug in your Android device via USB (with USB debugging enabled) or launch an emulator from Android Studio. Confirm Flutter can see it:
+
+    ```bash
+    flutter devices
+    ```
+  </Step>
+
+  <Step title="Run or build the app">
+    To run directly on your connected device:
+
+    ```bash
+    flutter run
+    ```
+
+    To produce a release APK you can share or sideload:
+
+    ```bash
+    flutter build apk --release
+    ```
+
+    The output APK is written to `build/app/outputs/flutter-apk/app-release.apk`.
+  </Step>
+</Steps>
+
+### Firebase configuration
+
+<Note>
+  Valstore uses Firebase for push notifications (`firebase_core`, `cloud_firestore`, `firebase_auth`). A valid `google-services.json` file must be placed in `android/app/` for the app to build and for notifications to function. Without it, the build will fail at the Gradle step.
+
+  To get this file, create a project in the [Firebase Console](https://console.firebase.google.com), register an Android app with the package name from `android/app/build.gradle`, and download the generated `google-services.json`.
+</Note>
+
+## Option 2: Sideload a release APK
+
+If you already have a compiled `app-release.apk`:
+
+<Steps>
+  <Step title="Enable installation from unknown sources">
+    On your Android device, go to **Settings → Apps → Special app access → Install unknown apps** and allow installs from your file manager or browser.
+  </Step>
+
+  <Step title="Transfer the APK to your device">
+    Copy the APK to your device via USB, email, or any file transfer method.
+  </Step>
+
+  <Step title="Open and install the APK">
+    Open the APK file from your device's file manager and follow the on-screen prompts to install.
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<Tip>
+  If skin images load slowly on first launch, this is expected — `cached_network_image` downloads and caches each asset from the Valorant API on first use. Subsequent loads are served from the local cache and will be near-instant.
+</Tip>

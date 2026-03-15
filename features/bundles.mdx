@@ -1,0 +1,58 @@
+---
+title: "Featured bundles"
+description: "Browse the current Valorant featured bundle with all included skins, pricing, and video previews."
+---
+
+The featured bundles page shows the bundle (or bundles) currently available in the Valorant store. Each bundle groups themed weapon skins together and is sold for a limited time.
+
+## What you see
+
+For each active bundle, Valstore displays:
+
+- **Bundle name** and display icon
+- **All included skins** with individual prices
+- **Video previews** for skin levels and chromas where available
+- **Bundle pricing** from the storefront response
+
+<Note>
+  Multiple bundles may be active simultaneously. Valstore returns a list from `getCurrentBundle()`, so all active bundles are shown.
+</Note>
+
+## Data source
+
+Bundle metadata comes from the community Valorant API:
+
+```
+https://valorant-api.com/v1/bundles/{bundleId}
+```
+
+This endpoint returns the bundle's display name, icon URL, and the list of skins included.
+
+```dart riot_service.dart
+static Future<List<BundleDisplayData?>> getCurrentBundle() async {
+  // Fetches featured bundle from storefront
+  // Returns list of BundleDisplayData with bundleData (ValApiBundleData) + skins
+  // Uses https://valorant-api.com/v1/bundles/{bundleId}
+}
+```
+
+Valstore fetches the current bundle UUID from your storefront, then requests the full bundle data from `valorant-api.com` to populate the display.
+
+## Background notifications
+
+The **`ValStoreBundleRenewal`** WorkManager task checks periodically for bundle changes. When a new featured bundle appears, you receive a local push notification.
+
+<Tip>
+  Bundle rotations are infrequent — usually every 2 weeks — but the background task ensures you're notified as soon as the store updates.
+</Tip>
+
+## Related features
+
+<CardGroup cols={2}>
+  <Card title="Player shop" icon="store" href="/features/player-shop">
+    See your 4 personalized daily skin offers.
+  </Card>
+  <Card title="Skin gallery" icon="images" href="/features/skin-gallery">
+    Browse the full skin catalog with level and chroma details.
+  </Card>
+</CardGroup>
