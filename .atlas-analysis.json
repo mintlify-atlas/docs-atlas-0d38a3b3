@@ -1,0 +1,82 @@
+{
+  "projectType": "saas",
+  "projectName": "Valstore",
+  "projectDescription": "A Flutter mobile app that provides portable access to your Valorant in-game shop, including daily offers, Night Market, bundles, skin gallery, wishlist, and push notifications.",
+  "theme": "almond",
+  "primaryColor": "#f84555",
+  "lightColor": "#962d36",
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": ["introduction", "getting-started/installation", "getting-started/login"]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "features/player-shop",
+              "features/night-market",
+              "features/bundles",
+              "features/skin-gallery",
+              "features/wishlist",
+              "features/inventory"
+            ]
+          },
+          {
+            "group": "Notifications",
+            "pages": [
+              "notifications/overview",
+              "notifications/troubleshooting"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/region-setup",
+              "configuration/account-settings"
+            ]
+          },
+          {
+            "group": "Development",
+            "pages": [
+              "development/architecture",
+              "development/api-integrations",
+              "development/building"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Daily player shop with skin offers and countdown timer",
+    "Night Market with discounted skin offers",
+    "Current bundles display with skin previews",
+    "Skin gallery with browsing and video previews",
+    "Wishlist with push notifications when wished skins appear in shop",
+    "Player inventory and equipped loadout viewer",
+    "Account info with VP/RP/Kingdom Credits balance",
+    "Background refresh via WorkManager for store renewal notifications",
+    "Firebase-backed wishlist sync across sessions"
+  ],
+  "publicApiSurface": [
+    "RiotService.getStore()",
+    "RiotService.getNightMarket()",
+    "RiotService.getCurrentBundle()",
+    "RiotService.getUserData()",
+    "RiotService.getUserOwnedItems()",
+    "RiotService.getPlayerEquipedSkins()",
+    "RiotService.recheckStore()",
+    "RiotService.recheckNightmarket()",
+    "RiotService.recheckBundle()",
+    "ValstoreProvider.initValstore()",
+    "ValstoreProvider.toggleWishlist(String uuid)",
+    "InofficialValorantAPI.getAllDisplayableItems()",
+    "InofficialValorantAPI.getLevelBorders()",
+    "NotificationService.initialize()"
+  ]
+}
